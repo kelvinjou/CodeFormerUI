@@ -7,19 +7,27 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		BE1A849D2A466F720027D07A /* FileSelection.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE1A849C2A466F720027D07A /* FileSelection.swift */; };
 		BE20356C2A29BA53008C1245 /* CodeFormerGUIApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE20356B2A29BA53008C1245 /* CodeFormerGUIApp.swift */; };
 		BE20356E2A29BA53008C1245 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE20356D2A29BA53008C1245 /* ContentView.swift */; };
 		BE2035702A29BA54008C1245 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BE20356F2A29BA54008C1245 /* Assets.xcassets */; };
 		BE2035732A29BA54008C1245 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BE2035722A29BA54008C1245 /* Preview Assets.xcassets */; };
+		BE20357C2A29BB7E008C1245 /* PythonKit in Frameworks */ = {isa = PBXBuildFile; productRef = BE20357B2A29BB7E008C1245 /* PythonKit */; };
+		BE20357E2A29BD30008C1245 /* Scripting.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE20357D2A29BD30008C1245 /* Scripting.swift */; };
+		BEC9CBEA2A47824A00D0321A /* SideBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEC9CBE92A47824A00D0321A /* SideBar.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		BE1A849B2A464CFA0027D07A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		BE1A849C2A466F720027D07A /* FileSelection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileSelection.swift; sourceTree = "<group>"; };
 		BE2035682A29BA53008C1245 /* CodeFormerGUI.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CodeFormerGUI.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		BE20356B2A29BA53008C1245 /* CodeFormerGUIApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodeFormerGUIApp.swift; sourceTree = "<group>"; };
 		BE20356D2A29BA53008C1245 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		BE20356F2A29BA54008C1245 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		BE2035722A29BA54008C1245 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		BE2035742A29BA54008C1245 /* CodeFormerGUI.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = CodeFormerGUI.entitlements; sourceTree = "<group>"; };
+		BE20357D2A29BD30008C1245 /* Scripting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Scripting.swift; sourceTree = "<group>"; };
+		BEC9CBE92A47824A00D0321A /* SideBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SideBar.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -27,6 +35,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BE20357C2A29BB7E008C1245 /* PythonKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -52,8 +61,12 @@
 		BE20356A2A29BA53008C1245 /* CodeFormerGUI */ = {
 			isa = PBXGroup;
 			children = (
+				BE1A849B2A464CFA0027D07A /* Info.plist */,
 				BE20356B2A29BA53008C1245 /* CodeFormerGUIApp.swift */,
 				BE20356D2A29BA53008C1245 /* ContentView.swift */,
+				BE1A849C2A466F720027D07A /* FileSelection.swift */,
+				BEC9CBE92A47824A00D0321A /* SideBar.swift */,
+				BE20357D2A29BD30008C1245 /* Scripting.swift */,
 				BE20356F2A29BA54008C1245 /* Assets.xcassets */,
 				BE2035742A29BA54008C1245 /* CodeFormerGUI.entitlements */,
 				BE2035712A29BA54008C1245 /* Preview Content */,
@@ -85,6 +98,9 @@
 			dependencies = (
 			);
 			name = CodeFormerGUI;
+			packageProductDependencies = (
+				BE20357B2A29BB7E008C1245 /* PythonKit */,
+			);
 			productName = CodeFormerGUI;
 			productReference = BE2035682A29BA53008C1245 /* CodeFormerGUI.app */;
 			productType = "com.apple.product-type.application";
@@ -113,6 +129,9 @@
 				Base,
 			);
 			mainGroup = BE20355F2A29BA53008C1245;
+			packageReferences = (
+				BE20357A2A29BB7E008C1245 /* XCRemoteSwiftPackageReference "PythonKit" */,
+			);
 			productRefGroup = BE2035692A29BA53008C1245 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -139,7 +158,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BEC9CBEA2A47824A00D0321A /* SideBar.swift in Sources */,
+				BE1A849D2A466F720027D07A /* FileSelection.swift in Sources */,
 				BE20356E2A29BA53008C1245 /* ContentView.swift in Sources */,
+				BE20357E2A29BD30008C1245 /* Scripting.swift in Sources */,
 				BE20356C2A29BA53008C1245 /* CodeFormerGUIApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -274,6 +296,7 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = CodeFormerGUI/Info.plist;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -301,6 +324,7 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = CodeFormerGUI/Info.plist;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -336,6 +360,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		BE20357A2A29BB7E008C1245 /* XCRemoteSwiftPackageReference "PythonKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/pvieito/PythonKit";
+			requirement = {
+				branch = master;
+				kind = branch;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		BE20357B2A29BB7E008C1245 /* PythonKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = BE20357A2A29BB7E008C1245 /* XCRemoteSwiftPackageReference "PythonKit" */;
+			productName = PythonKit;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = BE2035602A29BA53008C1245 /* Project object */;
 }
