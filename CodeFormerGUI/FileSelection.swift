@@ -221,3 +221,56 @@ struct FileSelection_Previews: PreviewProvider {
 //            print("Error creating folder: \(error.localizedDescription)")
 //        }
 //    }
+
+
+
+/*
+import SwiftUI
+
+struct ContentView: View {
+    @State private var imageUrls: [URL] = []
+    
+    var body: some View {
+        VStack {
+            if imageUrls.isEmpty {
+                Button("Select Images") {
+                    loadImageUrls()
+                }
+            } else {
+                List(imageUrls, id: \.self) { url in
+                    ImageView(url: url)
+                        .frame(height: 150)
+                }
+            }
+        }
+    }
+    
+    func loadImageUrls() {
+        do {
+            let documentDirectory = try FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: false)
+            let fileUrls = try FileManager.default.contentsOfDirectory(at: documentDirectory, includingPropertiesForKeys: nil, options: .skipsHiddenFiles)
+            let imageUrls = fileUrls.filter { url in
+                url.pathExtension.lowercased().contains("png") || url.pathExtension.lowercased().contains("jpg") || url.pathExtension.lowercased().contains("jpeg")
+            }
+            self.imageUrls = imageUrls
+        } catch {
+            print("Error: \(error.localizedDescription)")
+        }
+    }
+}
+
+struct ImageView: View {
+    var url: URL
+    
+    var body: some View {
+        if let image = NSImage(contentsOf: url) {
+            Image(nsImage: image)
+                .resizable()
+                .aspectRatio(contentMode: .fit)
+        } else {
+            Text("Unable to load image")
+        }
+    }
+}
+
+'''
