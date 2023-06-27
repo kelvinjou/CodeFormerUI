@@ -16,7 +16,16 @@ struct FileSelection: View {
     @State private var message = "Drag"
     
     @State private var imageUrls: [URL] = []
-
+    @State private var processedImageUrls: [URL] = []
+    
+    @State private var resultsAreOut = false
+    
+    let directoryURL = FileManager.default.homeDirectoryForCurrentUser
+                .appendingPathComponent("a970")
+                .appendingPathComponent("CodeFormer")
+                .appendingPathComponent("results")
+                .appendingPathComponent("ToBeProcessed_0.7")
+    
     
     var body: some View {
         VStack {
@@ -25,59 +34,84 @@ struct FileSelection: View {
                     .foregroundColor(Color.secondary.opacity(0.5))
                     .overlay(
                         VStack {
-//                            if path != nil {
-//                                Image(nsImage: getSavedImage(named: "\(path!.path)/\(filename)"))
-//                                getSavedImage(named: "\(path)/\(filename)")
-//                            } else {
-                                Image(systemName: "square.and.arrow.down.fill")
-                                    .resizable()
-                                    .aspectRatio(contentMode: .fit)
-                                    .frame(width: 50, height: 50)
-                                
-                                Text("Drag or select a file")
-                                Button("select file(s)") {
-                                    let panel = NSOpenPanel()
-                                    panel.allowsMultipleSelection = false
-                                    panel.canChooseDirectories = false
-                                    panel.allowedContentTypes = ["png", "jpg", "jpeg"]
-                                    if panel.runModal() == .OK {
-                                        let path = panel.url?.deletingLastPathComponent() // /Users/a970/Documents/
-                                        self.filename = panel.url?.lastPathComponent ?? "<none>" // blurry.png
-
-                                        self.path.append((panel.url)!)
-                                        print(panel.url?.path)
-                                        
-                                        let documentsURL = try! FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: false)
-                                        let folderURL = documentsURL.appendingPathComponent("ToBeProcessed")
-                                        do {
-                                            try FileManager.default.createDirectory(at: folderURL, withIntermediateDirectories: true)
-                                            print(documentsURL)
-                                        } catch {
-                                            print(error)
+                            if imageUrls.isEmpty {
+                                VStack {
+                                    Image(systemName: "square.and.arrow.down.fill")
+                                        .resizable()
+                                        .aspectRatio(contentMode: .fit)
+                                        .frame(width: 50, height: 50)
+                                    
+                                    Text("Drag or select a file")
+                                    Button("select file(s)") {
+                                        let panel = NSOpenPanel()
+                                        panel.allowsMultipleSelection = false
+                                        panel.canChooseDirectories = false
+                                        //                                    panel.allowedContentTypes = ["png", "jpg", "jpeg"]
+                                        if panel.runModal() == .OK {
+                                            let path = panel.url?.deletingLastPathComponent() // /Users/a970/Documents/
+                                            self.filename = panel.url?.lastPathComponent ?? "<none>" // blurry.png
+                                            
+                                            self.path.append((panel.url)!)
+                                            print(panel.url?.path)
+                                            
+                                            let documentsURL = try! FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: false)
+                                            let folderURL = documentsURL.appendingPathComponent("ToBeProcessed")
+                                            do {
+                                                try FileManager.default.createDirectory(at: folderURL, withIntermediateDirectories: true)
+                                                print(documentsURL)
+                                            } catch {
+                                                print(error)
+                                            }
                                         }
+                                        
+                                        copyFile(sourcePath: "\(panel.url!.path)", destinationPath: "/Users/a970/Documents/ToBeProcessed/\(panel.url!.lastPathComponent)")
+                                        getSelectedUnprocessedImages()
+                                    }
+                                }
+                            } else {
+                                VStack {
+                                    List(imageUrls, id: \.self) { url in
+                                        HStack {
+                                            ImageView(url: url)
+                                                .frame(width: 125, height: 125)
+                                            Text(url.lastPathComponent)
+                                            
+                                        }
+                                        
                                     }
 
-                                    copyFile(sourcePath: "\(panel.url!.path)", destinationPath: "/Users/a970/Documents/ToBeProcessed/\(panel.url!.lastPathComponent)")
-//                                    let openPanel = NSOpenPanel()
-//                                    openPanel.canChooseFiles = false
-//                                    openPanel.canChooseDirectories = true
-//                                    openPanel.allowsMultipleSelection = false
-//                                    openPanel.canCreateDirectories = false
-//
-//                                    openPanel.begin { response in
-//                                        guard response == .OK, let selectedUrl = openPanel.url else {
-//                                            // User canceled or no folder was selected
-//                                            return
-//                                        }
-//
-//                                        // Handle the selected folder URL here
-//                                        print("Selected folder: \(selectedUrl.path)")
-//                                        self.path = selectedUrl
-//                                    }
+                                    Spacer()
+                                    Button("select file(s)") {
+                                        let panel = NSOpenPanel()
+                                        panel.allowsMultipleSelection = false
+                                        panel.canChooseDirectories = false
+                                        //                                    panel.allowedContentTypes = ["png", "jpg", "jpeg"]
+                                        if panel.runModal() == .OK {
+                                            let path = panel.url?.deletingLastPathComponent() // /Users/a970/Documents/
+                                            self.filename = panel.url?.lastPathComponent ?? "<none>" // blurry.png
+                                            
+                                            self.path.append((panel.url)!)
+                                            print(panel.url?.path)
+                                            
+                                            let documentsURL = try! FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: false)
+                                            let folderURL = documentsURL.appendingPathComponent("ToBeProcessed")
+                                            do {
+                                                try FileManager.default.createDirectory(at: folderURL, withIntermediateDirectories: true)
+                                                print(documentsURL)
+                                            } catch {
+                                                print(error)
+                                            }
+                                        }
+                                        
+                                        copyFile(sourcePath: "\(panel.url!.path)", destinationPath: "/Users/a970/Documents/ToBeProcessed/\(panel.url!.lastPathComponent)")
+                                        getSelectedUnprocessedImages()
+                                    }
+                                
                                 }
-//                            }
+
+                            }
+                            
                         }
-                        
                         
                     )
                     .onDrop(of: [.fileURL], isTargeted: nil) { providers in
@@ -86,6 +120,9 @@ struct FileSelection: View {
                                 if let url = object {
                                     print("url: \(url.lastPathComponent)")
                                     self.filename = url.lastPathComponent
+                                    
+                                    copyFile(sourcePath: "\(url.path)", destinationPath: "/Users/a970/Documents/ToBeProcessed/\(url.lastPathComponent)")
+                                    getSelectedUnprocessedImages()
                                 }
                             }
                             return true
@@ -96,27 +133,17 @@ struct FileSelection: View {
                     .aspectRatio(contentMode: .fit)
                 RoundedRectangle(cornerRadius: 20)
                     .foregroundColor(Color.secondary.opacity(0.5))
-                    .overlay(Text("Result preview"))
-            }
-            
-            Text(filename)
-            Button("Select Folder") {
-                let openPanel = NSOpenPanel()
-                openPanel.canChooseFiles = false
-                openPanel.canChooseDirectories = true
-                openPanel.allowsMultipleSelection = false
-                openPanel.canCreateDirectories = false
-
-                openPanel.begin { response in
-                    guard response == .OK, let selectedUrl = openPanel.url else {
-                        // User canceled or no folder was selected
-                        return
-                    }
-                    
-
-                    // Handle the selected folder URL here
-                    print("Selected folder: \(selectedUrl.path)")
-                }
+                    .overlay(
+                        VStack {
+                            if resultsAreOut {
+                                ForEach(getImageURLs(), id: \.self) { imageURL in
+                                    loadImage(from: imageURL)
+                                }
+                            } else {
+                                Text("Result preview")
+                            }
+                        }
+                    )
             }
             Button("Save destination | GO") {
                 do {
@@ -131,19 +158,24 @@ struct FileSelection: View {
 //                    python inference_codeformer.py -w 0.7 --input_path /Users/a970/Documents/old_photos
                     
                     // destination: /Users/a970/CodeFormer/results/old_photos_0.7/final_results
-                    try safeShell("cd /Users/a970/CodeFormer; /Users/a970/opt/anaconda3/bin/python /Users/a970/CodeFormer/inference_codeformer.py -w 0.7 --input_path /Users/a970/Documents/old_photos")
-                    print(try safeShell("cd /Users/a970/CodeFormer; /Users/a970/opt/anaconda3/bin/python /Users/a970/CodeFormer/inference_codeformer.py -w 0.7 --input_path /Users/a970/Documents/old_photos"))
+                    try safeShell("cd /Users/a970/CodeFormer; /Users/a970/opt/anaconda3/bin/python /Users/a970/CodeFormer/inference_codeformer.py -w 0.7 --input_path /Users/a970/Documents/ToBeProcessed")
+                    print(try safeShell("cd /Users/a970/CodeFormer; /Users/a970/opt/anaconda3/bin/python /Users/a970/CodeFormer/inference_codeformer.py -w 0.7 --input_path /Users/a970/Documents/ToBeProcessed"))
+                    resultsAreOut.toggle()
+                    
                     
                 } catch {
                     print(error)
                 }
 
-            }
+            }.padding()
             
             
         }
         .padding()
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .onDisappear {
+            removeDirectory(atPath: "/Users/a970/Documents/ToBeProcessed/")
+        }
     }
     
     func showSavePanel() -> URL? {
@@ -158,16 +190,43 @@ struct FileSelection: View {
         let response = savePanel.runModal()
         return response == .OK ? savePanel.url : nil
     }
-    func getSelectedUnprocessedImages(named: String) {
+    
+    func getImageURLs() -> [URL] {
+            do {
+                let fileUrls = try FileManager.default.contentsOfDirectory(at: directoryURL, includingPropertiesForKeys: nil)
+                let imageUrls = fileUrls.filter { url in
+                    url.pathExtension.lowercased().contains("png") || url.pathExtension.lowercased().contains("jpg") || url.pathExtension.lowercased().contains("jpeg")
+                }
+                return imageUrls
+            } catch {
+                print("Error: \(error.localizedDescription)")
+                return []
+            }
+        }
+    
+    
+    func getSelectedUnprocessedImages() {
         do {
             let documentDirectory = try FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: false)
-            let fileUrls = try FileManager.default.contentsOfDirectory(at: documentDirectory, includingPropertiesForKeys: nil, options: .skipsHiddenFiles)
+            let appendedPath = documentDirectory.appendingPathComponent("toBeProcessed")
+            let fileUrls = try FileManager.default.contentsOfDirectory(at: appendedPath, includingPropertiesForKeys: nil, options: .skipsHiddenFiles)
+            
             let imageUrls = fileUrls.filter { url in
                 url.pathExtension.lowercased().contains("png") || url.pathExtension.lowercased().contains("jpg") || url.pathExtension.lowercased().contains("jpeg")
             }
             self.imageUrls = imageUrls
         } catch {
             print("Error: \(error.localizedDescription)")
+        }
+    }
+
+    func removeDirectory(atPath path: String) {
+        let fileManager = FileManager.default
+        do {
+            try fileManager.removeItem(atPath: path)
+            print("Directory removed successfully")
+        } catch {
+            print("Error removing directory: \(error.localizedDescription)")
         }
     }
     
@@ -180,82 +239,24 @@ struct FileSelection: View {
             } catch {
                 print("Error copying file: \(error.localizedDescription)")
             }
+    }
+    
+    @ViewBuilder
+    func loadImage(from imageURL: URL) -> some View {
+        if let image = NSImage(contentsOf: imageURL) {
+            Image(nsImage: image)
+                .resizable()
+                .aspectRatio(contentMode: .fit)
+                .frame(width: 200, height: 200)
+        } else {
+            Text("Image not found")
         }
+    }
 }
 
 struct FileSelection_Previews: PreviewProvider {
     static var previews: some View {
         FileSelection()
-    }
-}
-
-//typealias UIImage = NSImage
-//
-//// Step 2: You might want to add these APIs that UIImage has but NSImage doesn't.
-//extension NSImage {
-//    var cgImage: CGImage? {
-//        var proposedRect = CGRect(origin: .zero, size: size)
-//
-//        return cgImage(forProposedRect: &proposedRect,
-//                       context: nil,
-//                       hints: nil)
-//    }
-//
-//    convenience init?(named name: String) {
-//        self.init(named: Name(name))
-//    }
-//}
-
-
-//func createFolder() {
-//        let fileManager = FileManager.default
-//        let folderName = "ToBeProcessed"
-//        let destinationURL = URL(fileURLWithPath: "/path/to/your/desired/location/")
-//        let folderURL = destinationURL.appendingPathComponent(folderName)
-//
-//        do {
-//            try fileManager.createDirectory(at: folderURL, withIntermediateDirectories: true, attributes: nil)
-//            print("Folder created successfully")
-//            print("Folder path: \(folderURL.path)")
-//        } catch {
-//            print("Error creating folder: \(error.localizedDescription)")
-//        }
-//    }
-
-
-
-/*
-import SwiftUI
-
-struct ContentView: View {
-    @State private var imageUrls: [URL] = []
-    
-    var body: some View {
-        VStack {
-            if imageUrls.isEmpty {
-                Button("Select Images") {
-                    loadImageUrls()
-                }
-            } else {
-                List(imageUrls, id: \.self) { url in
-                    ImageView(url: url)
-                        .frame(height: 150)
-                }
-            }
-        }
-    }
-    
-    func loadImageUrls() {
-        do {
-            let documentDirectory = try FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: false)
-            let fileUrls = try FileManager.default.contentsOfDirectory(at: documentDirectory, includingPropertiesForKeys: nil, options: .skipsHiddenFiles)
-            let imageUrls = fileUrls.filter { url in
-                url.pathExtension.lowercased().contains("png") || url.pathExtension.lowercased().contains("jpg") || url.pathExtension.lowercased().contains("jpeg")
-            }
-            self.imageUrls = imageUrls
-        } catch {
-            print("Error: \(error.localizedDescription)")
-        }
     }
 }
 
@@ -272,5 +273,3 @@ struct ImageView: View {
         }
     }
 }
-
-'''
