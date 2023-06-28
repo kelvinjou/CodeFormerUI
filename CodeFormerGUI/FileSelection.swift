@@ -22,11 +22,11 @@ struct FileSelection: View {
     
     @State private var progressBarIsLoading = false
     
-    let directoryURL = FileManager.default.homeDirectoryForCurrentUser
-                .appendingPathComponent("a970")
-                .appendingPathComponent("CodeFormer")
-                .appendingPathComponent("results")
-                .appendingPathComponent("ToBeProcessed_0.7")
+//    let directoryURL = FileManager.default.homeDirectoryForCurrentUser
+//                .appendingPathComponent("a970")
+//                .appendingPathComponent("CodeFormer")
+//                .appendingPathComponent("results")
+//                .appendingPathComponent("ToBeProcessed_0.7")
     
     
     var body: some View {
@@ -137,13 +137,13 @@ struct FileSelection: View {
                     .foregroundColor(Color.secondary.opacity(0.5))
                     .overlay(
                         VStack {
-//                            if resultsAreOut {
-//                                ForEach(getImageURLs(), id: \.self) { imageURL in
-//                                    loadImage(from: imageURL)
-//                                }
-//                            } else {
+                            if !processedImageUrls.isEmpty {
+                                ForEach(processedImageUrls, id: \.self) { imageURL in
+                                    loadImage(from: imageURL)
+                                }
+                            } else {
                                 Text("Result preview")
-//                            }
+                            }
                         }
                     )
             }
@@ -160,11 +160,14 @@ struct FileSelection: View {
 //                    python inference_codeformer.py -w 0.7 --input_path /Users/a970/Documents/old_photos
                     
                     // destination: /Users/a970/CodeFormer/results/old_photos_0.7/final_results
+                    
                     progressBarIsLoading = true
-                    try safeShell("cd /Users/a970/CodeFormer; /Users/a970/opt/anaconda3/bin/python /Users/a970/CodeFormer/inference_codeformer.py -w 0.7 --input_path /Users/a970/Documents/ToBeProcessed")
-                    print(try safeShell("cd /Users/a970/CodeFormer; /Users/a970/opt/anaconda3/bin/python /Users/a970/CodeFormer/inference_codeformer.py -w 0.7 --input_path /Users/a970/Documents/ToBeProcessed"))
+                    safeShell("cd /Users/a970/CodeFormer; /Users/a970/opt/anaconda3/bin/python /Users/a970/CodeFormer/inference_codeformer.py -w 0.7 --input_path /Users/a970/Documents/ToBeProcessed")
+                    print(safeShell("cd /Users/a970/CodeFormer; /Users/a970/opt/anaconda3/bin/python /Users/a970/CodeFormer/inference_codeformer.py -w 0.7 --input_path /Users/a970/Documents/ToBeProcessed"))
                     resultsAreOut.toggle()
                     progressBarIsLoading = false
+                    
+                    getSelectedProcessedImages()
                     
                     
                 } catch {
@@ -195,18 +198,43 @@ struct FileSelection: View {
         return response == .OK ? savePanel.url : nil
     }
     
-    func getImageURLs() {
+    func getSelectedProcessedImages() {
         do {
             #warning("change path here")
-            let documentDirectory = try FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: false)
-            let appendedPath = documentDirectory.appendingPathComponent("toBeProcessed")
-            let fileUrls = try FileManager.default.contentsOfDirectory(at: appendedPath, includingPropertiesForKeys: nil, options: .skipsHiddenFiles)
-            
-            let imageUrls = fileUrls.filter { url in
-                url.pathExtension.lowercased().contains("png") || url.pathExtension.lowercased().contains("jpg") || url.pathExtension.lowercased().contains("jpeg")
+            let fileManager = FileManager.default
+            if let rootURL = fileManager.urls(for: .userDirectory, in: .localDomainMask).first {
+                // Perform operations with the root URL here
+                //                        print("Root Folder URL: \(rootURL)")
+                let userURL = rootURL
+                    .appendingPathComponent(NSUserName())
+                    .appendingPathComponent("CodeFormer")
+                    .appendingPathComponent("results")
+                    .appendingPathComponent("ToBeProcessed_0.7")
+                    .appendingPathComponent("final_results")
+                
+                
+                let fileUrls = try FileManager.default.contentsOfDirectory(at: userURL, includingPropertiesForKeys: nil, options: .skipsHiddenFiles)
+                let imageUrls = fileUrls.filter { url in
+                    url.pathExtension.lowercased().contains("png") || url.pathExtension.lowercased().contains("jpg") || url.pathExtension.lowercased().contains("jpeg")
+                }
+                
+                self.processedImageUrls = imageUrls
+                print(processedImageUrls)
+            } else {
+                print("Unable to access the root folder.")
             }
             
-            self.processedImageUrls = imageUrls
+//            let documentDirectory = try FileManager.default.url(for: .userDirectory, in: .userDomainMask, appropriateFor: nil, create: false)
+//            let appendedPath = documentDirectory.appendingPathComponent("CodeFormer")
+//            let fileUrls = try FileManager.default.contentsOfDirectory(at: appendedPath, includingPropertiesForKeys: nil, options: .skipsHiddenFiles)
+//
+//            let imageUrls = fileUrls.filter { url in
+//                url.pathExtension.lowercased().contains("png") || url.pathExtension.lowercased().contains("jpg") || url.pathExtension.lowercased().contains("jpeg")
+//            }
+            
+            
+            
+//            self.processedImageUrls = imageUrls
 //            self.imageUrls = imageUrls
         } catch {
             print("Error: \(error.localizedDescription)")
