@@ -263,12 +263,6 @@ struct FileSelection: View {
     }
 }
 
-struct FileSelection_Previews: PreviewProvider {
-    static var previews: some View {
-        FileSelection()
-    }
-}
-
 struct ImageView: View {
     var url: URL
     
