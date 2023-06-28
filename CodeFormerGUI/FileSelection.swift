@@ -137,13 +137,13 @@ struct FileSelection: View {
                     .foregroundColor(Color.secondary.opacity(0.5))
                     .overlay(
                         VStack {
-                            if resultsAreOut {
-                                ForEach(getImageURLs(), id: \.self) { imageURL in
-                                    loadImage(from: imageURL)
-                                }
-                            } else {
+//                            if resultsAreOut {
+//                                ForEach(getImageURLs(), id: \.self) { imageURL in
+//                                    loadImage(from: imageURL)
+//                                }
+//                            } else {
                                 Text("Result preview")
-                            }
+//                            }
                         }
                     )
             }
@@ -195,18 +195,23 @@ struct FileSelection: View {
         return response == .OK ? savePanel.url : nil
     }
     
-    func getImageURLs() -> [URL] {
-            do {
-                let fileUrls = try FileManager.default.contentsOfDirectory(at: directoryURL, includingPropertiesForKeys: nil)
-                let imageUrls = fileUrls.filter { url in
-                    url.pathExtension.lowercased().contains("png") || url.pathExtension.lowercased().contains("jpg") || url.pathExtension.lowercased().contains("jpeg")
-                }
-                return imageUrls
-            } catch {
-                print("Error: \(error.localizedDescription)")
-                return []
+    func getImageURLs() {
+        do {
+            #warning("change path here")
+            let documentDirectory = try FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: false)
+            let appendedPath = documentDirectory.appendingPathComponent("toBeProcessed")
+            let fileUrls = try FileManager.default.contentsOfDirectory(at: appendedPath, includingPropertiesForKeys: nil, options: .skipsHiddenFiles)
+            
+            let imageUrls = fileUrls.filter { url in
+                url.pathExtension.lowercased().contains("png") || url.pathExtension.lowercased().contains("jpg") || url.pathExtension.lowercased().contains("jpeg")
             }
+            
+            self.processedImageUrls = imageUrls
+//            self.imageUrls = imageUrls
+        } catch {
+            print("Error: \(error.localizedDescription)")
         }
+    }
     
     
     func getSelectedUnprocessedImages() {
