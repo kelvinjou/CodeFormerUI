@@ -14,7 +14,7 @@
 		BE2035732A29BA54008C1245 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BE2035722A29BA54008C1245 /* Preview Assets.xcassets */; };
 		BE20357C2A29BB7E008C1245 /* PythonKit in Frameworks */ = {isa = PBXBuildFile; productRef = BE20357B2A29BB7E008C1245 /* PythonKit */; };
 		BE20357E2A29BD30008C1245 /* Scripting.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE20357D2A29BD30008C1245 /* Scripting.swift */; };
-		BEC9CBEA2A47824A00D0321A /* SideBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEC9CBE92A47824A00D0321A /* SideBar.swift */; };
+		F4047D7F2A4BAB22008E2DE7 /* Home.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4047D7E2A4BAB22008E2DE7 /* Home.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -27,7 +27,7 @@
 		BE2035722A29BA54008C1245 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		BE2035742A29BA54008C1245 /* CodeFormerGUI.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = CodeFormerGUI.entitlements; sourceTree = "<group>"; };
 		BE20357D2A29BD30008C1245 /* Scripting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Scripting.swift; sourceTree = "<group>"; };
-		BEC9CBE92A47824A00D0321A /* SideBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SideBar.swift; sourceTree = "<group>"; };
+		F4047D7E2A4BAB22008E2DE7 /* Home.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Home.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -65,7 +65,7 @@
 				BE20356B2A29BA53008C1245 /* CodeFormerGUIApp.swift */,
 				BE20356D2A29BA53008C1245 /* ContentView.swift */,
 				BE1A849C2A466F720027D07A /* FileSelection.swift */,
-				BEC9CBE92A47824A00D0321A /* SideBar.swift */,
+				F4047D7E2A4BAB22008E2DE7 /* Home.swift */,
 				BE20357D2A29BD30008C1245 /* Scripting.swift */,
 				BE20356F2A29BA54008C1245 /* Assets.xcassets */,
 				BE2035742A29BA54008C1245 /* CodeFormerGUI.entitlements */,
@@ -158,10 +158,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				BEC9CBEA2A47824A00D0321A /* SideBar.swift in Sources */,
 				BE1A849D2A466F720027D07A /* FileSelection.swift in Sources */,
 				BE20356E2A29BA53008C1245 /* ContentView.swift in Sources */,
 				BE20357E2A29BD30008C1245 /* Scripting.swift in Sources */,
+				F4047D7F2A4BAB22008E2DE7 /* Home.swift in Sources */,
 				BE20356C2A29BA53008C1245 /* CodeFormerGUIApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

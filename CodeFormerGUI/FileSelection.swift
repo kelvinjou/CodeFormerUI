@@ -20,6 +20,8 @@ struct FileSelection: View {
     
     @State private var resultsAreOut = false
     
+    @State private var progressBarIsLoading = false
+    
     let directoryURL = FileManager.default.homeDirectoryForCurrentUser
                 .appendingPathComponent("a970")
                 .appendingPathComponent("CodeFormer")
@@ -158,9 +160,11 @@ struct FileSelection: View {
 //                    python inference_codeformer.py -w 0.7 --input_path /Users/a970/Documents/old_photos
                     
                     // destination: /Users/a970/CodeFormer/results/old_photos_0.7/final_results
+                    progressBarIsLoading = true
                     try safeShell("cd /Users/a970/CodeFormer; /Users/a970/opt/anaconda3/bin/python /Users/a970/CodeFormer/inference_codeformer.py -w 0.7 --input_path /Users/a970/Documents/ToBeProcessed")
                     print(try safeShell("cd /Users/a970/CodeFormer; /Users/a970/opt/anaconda3/bin/python /Users/a970/CodeFormer/inference_codeformer.py -w 0.7 --input_path /Users/a970/Documents/ToBeProcessed"))
                     resultsAreOut.toggle()
+                    progressBarIsLoading = false
                     
                     
                 } catch {
