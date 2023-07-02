@@ -22,189 +22,243 @@ struct FileSelection: View {
     
     @State private var progressBarIsLoading = false
     
-//    let directoryURL = FileManager.default.homeDirectoryForCurrentUser
-//                .appendingPathComponent("a970")
-//                .appendingPathComponent("CodeFormer")
-//                .appendingPathComponent("results")
-//                .appendingPathComponent("ToBeProcessed_0.7")
+    //    let directoryURL = FileManager.default.homeDirectoryForCurrentUser
+    //                .appendingPathComponent("a970")
+    //                .appendingPathComponent("CodeFormer")
+    //                .appendingPathComponent("results")
+    //                .appendingPathComponent("ToBeProcessed_0.7")
     
     
     var body: some View {
-        VStack {
-            HStack {
-                RoundedRectangle(cornerRadius: 20)
-                    .foregroundColor(Color.secondary.opacity(0.5))
-                    .overlay(
-                        VStack {
-                            if imageUrls.isEmpty {
-                                VStack {
-                                    Image(systemName: "square.and.arrow.down.fill")
-                                        .resizable()
-                                        .aspectRatio(contentMode: .fit)
-                                        .frame(width: 50, height: 50)
+        ZStack {
+            VStack {
+                HStack {
+                    RoundedRectangle(cornerRadius: 20)
+                        .foregroundColor(Color.secondary.opacity(0.5))
+                        .overlay(
+                            VStack {
+                                if imageUrls.isEmpty {
+                                    VStack {
+                                        Image(systemName: "square.and.arrow.down.fill")
+                                            .resizable()
+                                            .aspectRatio(contentMode: .fit)
+                                            .frame(width: 50, height: 50)
+                                        
+                                        Text("Drag or select a file")
+                                        Button("Select File(s)") {
+                                            let panel = NSOpenPanel()
+                                            panel.allowsMultipleSelection = false
+                                            panel.canChooseDirectories = false
+                                            //                                    panel.allowedContentTypes = ["png", "jpg", "jpeg"]
+                                            if panel.runModal() == .OK {
+                                                let path = panel.url?.deletingLastPathComponent() // /Users/a970/Documents/
+                                                self.filename = panel.url?.lastPathComponent ?? "<none>" // blurry.png
+                                                
+                                                self.path.append((panel.url)!)
+                                                print(panel.url?.path)
+                                                
+                                                let documentsURL = try! FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: false)
+                                                let folderURL = documentsURL
+                                                    .appendingPathComponent(".CodeFormerGUI")
+                                                    .appendingPathComponent("ToBeProcessed")
+                                                do {
+                                                    try FileManager.default.createDirectory(at: folderURL, withIntermediateDirectories: true)
+                                                    print(documentsURL)
+                                                } catch {
+                                                    print(error)
+                                                }
+                                                
+                                                copyFile(sourcePath: "\(panel.url!.path)", filename: panel.url!.lastPathComponent)
+                                                getSelectedUnprocessedImages()
+                                            }
+                                            
+                                            
+                                        }
+                                    }
+                                } else {
+                                    VStack {
+                                        ForEach(imageUrls, id: \.self) { url in
+                                            HStack {
+                                                ImageView(url: url)
+                                                    .cornerRadius(10)
+                                                    .frame(width: 125, height: 125)
+                                                
+                                                Spacer()
+                                                Text(url.lastPathComponent)
+                                                
+                                            }.padding(.horizontal, 10)
+                                            
+                                        }
+                                        
+                                        Spacer()
+                                        Button("Select More") {
+                                            let panel = NSOpenPanel()
+                                            panel.allowsMultipleSelection = false
+                                            panel.canChooseDirectories = false
+                                            //                                    panel.allowedContentTypes = ["png", "jpg", "jpeg"]
+                                            if panel.runModal() == .OK {
+                                                let path = panel.url?.deletingLastPathComponent() // /Users/a970/Documents/
+                                                self.filename = panel.url?.lastPathComponent ?? "<none>" // blurry.png
+                                                
+                                                self.path.append((panel.url)!)
+                                                print(panel.url?.path)
+                                                
+                                                let documentsURL = try! FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: false)
+                                                let folderURL = documentsURL
+                                                    .appendingPathComponent(".CodeFormerGUI")
+                                                    .appendingPathComponent("ToBeProcessed")
+                                                do {
+                                                    try FileManager.default.createDirectory(at: folderURL, withIntermediateDirectories: true)
+                                                    print(documentsURL)
+                                                } catch {
+                                                    print(error)
+                                                }
+                                                copyFile(sourcePath: "\(panel.url!.path)", filename: panel.url!.lastPathComponent)
+                                                getSelectedUnprocessedImages()
+                                            }
+                                            
+                                            
+                                        }
+                                        .padding(10)
+                                        
+                                    }
                                     
-                                    Text("Drag or select a file")
-                                    Button("select file(s)") {
-                                        let panel = NSOpenPanel()
-                                        panel.allowsMultipleSelection = false
-                                        panel.canChooseDirectories = false
-                                        //                                    panel.allowedContentTypes = ["png", "jpg", "jpeg"]
-                                        if panel.runModal() == .OK {
-                                            let path = panel.url?.deletingLastPathComponent() // /Users/a970/Documents/
-                                            self.filename = panel.url?.lastPathComponent ?? "<none>" // blurry.png
-                                            
-                                            self.path.append((panel.url)!)
-                                            print(panel.url?.path)
-                                            
-                                            let documentsURL = try! FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: false)
-                                            let folderURL = documentsURL.appendingPathComponent("ToBeProcessed")
-                                            do {
-                                                try FileManager.default.createDirectory(at: folderURL, withIntermediateDirectories: true)
-                                                print(documentsURL)
-                                            } catch {
-                                                print(error)
-                                            }
-                                        }
-                                        
-                                        copyFile(sourcePath: "\(panel.url!.path)", destinationPath: "/Users/a970/Documents/ToBeProcessed/\(panel.url!.lastPathComponent)")
-                                        getSelectedUnprocessedImages()
-                                    }
                                 }
-                            } else {
-                                VStack {
-                                    List(imageUrls, id: \.self) { url in
-                                        HStack {
-                                            ImageView(url: url)
-                                                .frame(width: 125, height: 125)
-                                            Text(url.lastPathComponent)
-                                            
-                                        }
-                                        
-                                    }
-
-                                    Spacer()
-                                    Button("select file(s)") {
-                                        let panel = NSOpenPanel()
-                                        panel.allowsMultipleSelection = false
-                                        panel.canChooseDirectories = false
-                                        //                                    panel.allowedContentTypes = ["png", "jpg", "jpeg"]
-                                        if panel.runModal() == .OK {
-                                            let path = panel.url?.deletingLastPathComponent() // /Users/a970/Documents/
-                                            self.filename = panel.url?.lastPathComponent ?? "<none>" // blurry.png
-                                            
-                                            self.path.append((panel.url)!)
-                                            print(panel.url?.path)
-                                            
-                                            let documentsURL = try! FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: false)
-                                            let folderURL = documentsURL.appendingPathComponent("ToBeProcessed")
-                                            do {
-                                                try FileManager.default.createDirectory(at: folderURL, withIntermediateDirectories: true)
-                                                print(documentsURL)
-                                            } catch {
-                                                print(error)
-                                            }
-                                        }
-                                        
-                                        copyFile(sourcePath: "\(panel.url!.path)", destinationPath: "/Users/a970/Documents/ToBeProcessed/\(panel.url!.lastPathComponent)")
-                                        getSelectedUnprocessedImages()
-                                    }
                                 
-                                }
-
                             }
                             
+                        )
+                        .onDrop(of: [.fileURL], isTargeted: nil) { providers in
+                            if let provider = providers.first(where: { $0.canLoadObject(ofClass: URL.self) } ) {
+                                let _ = provider.loadObject(ofClass: URL.self) { object, error in
+                                    if let url = object {
+                                        print("url: \(url.lastPathComponent)")
+                                        self.filename = url.lastPathComponent
+                                        
+                                        copyFile(sourcePath: "\(url.path)", filename: url.lastPathComponent)
+                                        getSelectedUnprocessedImages()
+                                    }
+                                }
+                                return true
+                            }
+                            return false
                         }
-                        
-                    )
-                    .onDrop(of: [.fileURL], isTargeted: nil) { providers in
-                        if let provider = providers.first(where: { $0.canLoadObject(ofClass: URL.self) } ) {
-                            let _ = provider.loadObject(ofClass: URL.self) { object, error in
-                                if let url = object {
-                                    print("url: \(url.lastPathComponent)")
-                                    self.filename = url.lastPathComponent
+                    Image(systemName: "arrow.right")
+                        .aspectRatio(contentMode: .fit)
+                    RoundedRectangle(cornerRadius: 20)
+                        .foregroundColor(Color.secondary.opacity(0.5))
+                        .overlay(
+                            VStack {
+                                if !processedImageUrls.isEmpty {
+                                    VStack {
+                                    ForEach(processedImageUrls, id: \.self) { imageURL in
+                                        HStack {
+                                            ImageView(url: imageURL)
+                                                .cornerRadius(10)
+                                                .frame(width: 125, height: 125)
+                                            
+                                            Spacer()
+                                            Text(imageURL.lastPathComponent)
+                                        }
+                                        
+                                    }.padding(.horizontal, 10)
+                                        
+                                        Spacer()
+                                        Divider()
+                                            .background(Color.gray.opacity(0.5))
+                                        HStack {
+                                            Text("Save all to folder")
+                                            Spacer()
+                                            Image(systemName: "arrow.right")
+                                                .aspectRatio(contentMode: .fit)
+                                            Spacer(minLength: 0)
+                                            Button(action: {
+                                                let panel = NSOpenPanel()
+                                                panel.canChooseFiles = false
+                                                panel.canChooseDirectories = true
+                                                panel.allowsMultipleSelection = false
+                                                panel.canCreateDirectories = true
+                                                panel.prompt = "Save here"
+                                                
+                                                panel.begin { response in
+                                                    if response == NSApplication.ModalResponse.OK {
+                                                        if let selectedFolderURL = panel.url {
+                                                            // Handle the selected folder URL here
+                                                            print("Selected Folder URL: \(selectedFolderURL)")
+                                                        }
+                                                    }
+                                                }
+                                            }) {
+                                                Text("Choose Location")
+                                                
+                                            }
+                                        }.padding(.horizontal)
+                                    }
                                     
-                                    copyFile(sourcePath: "\(url.path)", destinationPath: "/Users/a970/Documents/ToBeProcessed/\(url.lastPathComponent)")
-                                    getSelectedUnprocessedImages()
+                                } else {
+                                    Text("Result preview")
                                 }
                             }
-                            return true
-                        }
-                        return false
-                    }
-                Image(systemName: "arrow.right")
-                    .aspectRatio(contentMode: .fit)
-                RoundedRectangle(cornerRadius: 20)
-                    .foregroundColor(Color.secondary.opacity(0.5))
-                    .overlay(
-                        VStack {
-                            if !processedImageUrls.isEmpty {
-                                ForEach(processedImageUrls, id: \.self) { imageURL in
-                                    loadImage(from: imageURL)
-                                }
-                            } else {
-                                Text("Result preview")
-                            }
-                        }
-                    )
-            }
-            Button("Save destination | GO") {
-                do {
+                        )
+                }
+                Button(action: {
+                    
+                    progressBarIsLoading = true
+                    
                     /*TODO: create a temporary FileManager folder that stores all the user selected photos
                      then, create a small preview of all the selected photos
                      then click generate results (should have a loader) which it will get the newly processed images from results under codeformer
                      then have option to save it to a new path, and delete the old folder
                      
                      PREVIEW RESULTS BEFORE SAVING
-                    
+                     
                      */
-//                    python inference_codeformer.py -w 0.7 --input_path /Users/a970/Documents/old_photos
+                    //                    python inference_codeformer.py -w 0.7 --input_path /Users/a970/Documents/old_photos
                     
                     // destination: /Users/a970/CodeFormer/results/old_photos_0.7/final_results
                     
-                    progressBarIsLoading = true
-                    safeShell("cd /Users/a970/CodeFormer; /Users/a970/opt/anaconda3/bin/python /Users/a970/CodeFormer/inference_codeformer.py -w 0.7 --input_path /Users/a970/Documents/ToBeProcessed")
-                    print(safeShell("cd /Users/a970/CodeFormer; /Users/a970/opt/anaconda3/bin/python /Users/a970/CodeFormer/inference_codeformer.py -w 0.7 --input_path /Users/a970/Documents/ToBeProcessed"))
+                    DispatchQueue.global().async {
+                        safeShell("cd /Users/\(NSUserName())/CodeFormer; /Users/\(NSUserName())/opt/anaconda3/bin/python /Users/\(NSUserName())/CodeFormer/inference_codeformer.py -w 0.7 --input_path /Users/\(NSUserName())/Documents/.CodeFormerGUI/ToBeProcessed")
+                        print(safeShell("cd /Users/\(NSUserName())/CodeFormer; /Users/\(NSUserName())/opt/anaconda3/bin/python /Users/\(NSUserName())/CodeFormer/inference_codeformer.py -w 0.7 --input_path /Users/\(NSUserName())/Documents/.CodeFormerGUI/ToBeProcessed"))
+                    }
                     resultsAreOut.toggle()
                     progressBarIsLoading = false
                     
                     getSelectedProcessedImages()
                     
-                    
-                } catch {
-                    print(error)
+                }) {
+                    Text("Enhance")
+                        .bold()
                 }
-
-            }.padding()
+                .buttonStyle(BlueButtonStyle(isButtonEnabled: imageUrls.isEmpty))
+                .padding(.vertical, 10)
+                if progressBarIsLoading {
+                    Text("LOADING")
+                }
+                
+                
+            }
+            .padding()
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .onDisappear {
+                removeDirectory()
+            }
+            .onAppear {
+                print("Users/\(NSUserName())/Documents/.CodeFormerGUI/ToBeProcessed")
+            }
             
-            
-        }
-        .padding()
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .onDisappear {
-            removeDirectory(atPath: "/Users/a970/Documents/ToBeProcessed/")
+            if progressBarIsLoading {
+                ProgressView("Downloading")
+                    .progressViewStyle(LinearProgressViewStyle())
+            }
         }
     }
     
-    func showSavePanel() -> URL? {
-        let savePanel = NSSavePanel()
-        savePanel.allowedContentTypes = [.png, .jpeg]
-        savePanel.canCreateDirectories = true
-        savePanel.isExtensionHidden = false
-        savePanel.title = "Save your image"
-        savePanel.message = "Choose a folder and a name to store the image"
-        savePanel.nameFieldLabel = "Image file name:"
-        
-        let response = savePanel.runModal()
-        return response == .OK ? savePanel.url : nil
-    }
     
     func getSelectedProcessedImages() {
         do {
-            #warning("change path here")
             let fileManager = FileManager.default
             if let rootURL = fileManager.urls(for: .userDirectory, in: .localDomainMask).first {
-                // Perform operations with the root URL here
-                //                        print("Root Folder URL: \(rootURL)")
                 let userURL = rootURL
                     .appendingPathComponent(NSUserName())
                     .appendingPathComponent("CodeFormer")
@@ -223,19 +277,6 @@ struct FileSelection: View {
             } else {
                 print("Unable to access the root folder.")
             }
-            
-//            let documentDirectory = try FileManager.default.url(for: .userDirectory, in: .userDomainMask, appropriateFor: nil, create: false)
-//            let appendedPath = documentDirectory.appendingPathComponent("CodeFormer")
-//            let fileUrls = try FileManager.default.contentsOfDirectory(at: appendedPath, includingPropertiesForKeys: nil, options: .skipsHiddenFiles)
-//
-//            let imageUrls = fileUrls.filter { url in
-//                url.pathExtension.lowercased().contains("png") || url.pathExtension.lowercased().contains("jpg") || url.pathExtension.lowercased().contains("jpeg")
-//            }
-            
-            
-            
-//            self.processedImageUrls = imageUrls
-//            self.imageUrls = imageUrls
         } catch {
             print("Error: \(error.localizedDescription)")
         }
@@ -245,7 +286,9 @@ struct FileSelection: View {
     func getSelectedUnprocessedImages() {
         do {
             let documentDirectory = try FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: false)
-            let appendedPath = documentDirectory.appendingPathComponent("toBeProcessed")
+            let appendedPath = documentDirectory
+                .appendingPathComponent(".CodeFormerGUI")
+                .appendingPathComponent("ToBeProcessed")
             let fileUrls = try FileManager.default.contentsOfDirectory(at: appendedPath, includingPropertiesForKeys: nil, options: .skipsHiddenFiles)
             
             let imageUrls = fileUrls.filter { url in
@@ -256,37 +299,46 @@ struct FileSelection: View {
             print("Error: \(error.localizedDescription)")
         }
     }
-
-    func removeDirectory(atPath path: String) {
+    
+    func removeDirectory() {
         let fileManager = FileManager.default
         do {
-            try fileManager.removeItem(atPath: path)
+            let documentDirectory = try FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: false)
+            let folderURL = documentDirectory
+                .appendingPathComponent(".CodeFormerGUI")
+                .appendingPathComponent("ToBeProcessed")
+            
+            try fileManager.removeItem(at: folderURL)
             print("Directory removed successfully")
         } catch {
             print("Error removing directory: \(error.localizedDescription)")
         }
     }
     
-    func copyFile(sourcePath: String, destinationPath: String) {
-            let fileManager = FileManager.default
-            
-            do {
-                try fileManager.copyItem(atPath: sourcePath, toPath: destinationPath)
-                print("File copied successfully")
-            } catch {
-                print("Error copying file: \(error.localizedDescription)")
-            }
+    func copyFile(sourcePath: String, filename: String) {
+        let fileManager = FileManager.default
+        
+        do {
+            let documentDirectory = try FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: false)
+            let folderURL = documentDirectory
+                .appendingPathComponent(".CodeFormerGUI")
+                .appendingPathComponent("ToBeProcessed")
+            try fileManager.copyItem(atPath: sourcePath, toPath: "\(folderURL.path)/\(filename)")
+            print("File copied successfully")
+        } catch {
+            print("Error copying file: \(error.localizedDescription)")
+        }
     }
     
-    @ViewBuilder
-    func loadImage(from imageURL: URL) -> some View {
-        if let image = NSImage(contentsOf: imageURL) {
-            Image(nsImage: image)
-                .resizable()
-                .aspectRatio(contentMode: .fit)
-                .frame(width: 200, height: 200)
-        } else {
-            Text("Image not found")
+    func saveFileToUserDefinedDestination(destinationPath: String) {
+        let fileManager = FileManager.default
+        if let rootURL = fileManager.urls(for: .userDirectory, in: .localDomainMask).first {
+            let userURL = rootURL
+                .appendingPathComponent(NSUserName())
+                .appendingPathComponent("CodeFormer")
+                .appendingPathComponent("results")
+                .appendingPathComponent("ToBeProcessed_0.7")
+                .appendingPathComponent("final_results")
         }
     }
 }
@@ -302,5 +354,17 @@ struct ImageView: View {
         } else {
             Text("Unable to load image")
         }
+    }
+}
+
+struct BlueButtonStyle: ButtonStyle {
+    let isButtonEnabled: Bool
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .padding(.vertical, 7)
+            .padding(.horizontal, 10)
+            .background(isButtonEnabled ? Color.blue.opacity(0.5) : Color.blue)
+            .foregroundColor(.white)
+            .cornerRadius(8)
     }
 }
