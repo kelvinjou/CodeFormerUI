@@ -38,7 +38,7 @@ struct Enhancements: Identifiable {
 final class ViewModel: ObservableObject {
   init(enhancement: [Enhancements] = ViewModel.defaultEnhancement) {
     self.enhancement = enhancement
-    self.selectedId = enhancement[1].id
+    self.selectedId = enhancement[0].id
   }
   @Published var enhancement: [Enhancements]
   @Published var selectedId: String?
