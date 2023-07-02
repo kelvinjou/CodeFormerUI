@@ -22,13 +22,6 @@ struct FileSelection: View {
     
     @State private var progressBarIsLoading = false
     
-    //    let directoryURL = FileManager.default.homeDirectoryForCurrentUser
-    //                .appendingPathComponent("a970")
-    //                .appendingPathComponent("CodeFormer")
-    //                .appendingPathComponent("results")
-    //                .appendingPathComponent("ToBeProcessed_0.7")
-    
-    
     var body: some View {
         ZStack {
             VStack {
@@ -151,17 +144,17 @@ struct FileSelection: View {
                             VStack {
                                 if !processedImageUrls.isEmpty {
                                     VStack {
-                                    ForEach(processedImageUrls, id: \.self) { imageURL in
-                                        HStack {
-                                            ImageView(url: imageURL)
-                                                .cornerRadius(10)
-                                                .frame(width: 125, height: 125)
+                                        ForEach(processedImageUrls, id: \.self) { imageURL in
+                                            HStack {
+                                                ImageView(url: imageURL)
+                                                    .cornerRadius(10)
+                                                    .frame(width: 125, height: 125)
+                                                
+                                                Spacer()
+                                                Text(imageURL.lastPathComponent)
+                                            }
                                             
-                                            Spacer()
-                                            Text(imageURL.lastPathComponent)
-                                        }
-                                        
-                                    }.padding(.horizontal, 10)
+                                        }.padding(.horizontal, 10)
                                         
                                         Spacer()
                                         Divider()
@@ -185,14 +178,14 @@ struct FileSelection: View {
                                                         if let selectedFolderURL = panel.url {
                                                             // Handle the selected folder URL here
                                                             print("Selected Folder URL: \(selectedFolderURL)")
+                                                            saveFileToUserDefinedDestination(destinationPath: selectedFolderURL)
                                                         }
                                                     }
                                                 }
                                             }) {
                                                 Text("Choose Location")
-                                                
                                             }
-                                        }.padding(.horizontal)
+                                        }.padding(10)
                                     }
                                     
                                 } else {
@@ -217,10 +210,10 @@ struct FileSelection: View {
                     
                     // destination: /Users/a970/CodeFormer/results/old_photos_0.7/final_results
                     
-                    DispatchQueue.global().async {
-                        safeShell("cd /Users/\(NSUserName())/CodeFormer; /Users/\(NSUserName())/opt/anaconda3/bin/python /Users/\(NSUserName())/CodeFormer/inference_codeformer.py -w 0.7 --input_path /Users/\(NSUserName())/Documents/.CodeFormerGUI/ToBeProcessed")
-                        print(safeShell("cd /Users/\(NSUserName())/CodeFormer; /Users/\(NSUserName())/opt/anaconda3/bin/python /Users/\(NSUserName())/CodeFormer/inference_codeformer.py -w 0.7 --input_path /Users/\(NSUserName())/Documents/.CodeFormerGUI/ToBeProcessed"))
-                    }
+//                    DispatchQueue.global().async {
+//                        safeShell("cd /Users/\(NSUserName())/CodeFormer; /Users/\(NSUserName())/opt/anaconda3/bin/python /Users/\(NSUserName())/CodeFormer/inference_codeformer.py -w 0.7 --input_path /Users/\(NSUserName())/Documents/.CodeFormerGUI/ToBeProcessed")
+//                        print(safeShell("cd /Users/\(NSUserName())/CodeFormer; /Users/\(NSUserName())/opt/anaconda3/bin/python /Users/\(NSUserName())/CodeFormer/inference_codeformer.py -w 0.7 --input_path /Users/\(NSUserName())/Documents/.CodeFormerGUI/ToBeProcessed"))
+//                    }
                     resultsAreOut.toggle()
                     progressBarIsLoading = false
                     
@@ -330,15 +323,22 @@ struct FileSelection: View {
         }
     }
     
-    func saveFileToUserDefinedDestination(destinationPath: String) {
+    func saveFileToUserDefinedDestination(destinationPath: URL) {
         let fileManager = FileManager.default
         if let rootURL = fileManager.urls(for: .userDirectory, in: .localDomainMask).first {
-            let userURL = rootURL
-                .appendingPathComponent(NSUserName())
-                .appendingPathComponent("CodeFormer")
-                .appendingPathComponent("results")
-                .appendingPathComponent("ToBeProcessed_0.7")
-                .appendingPathComponent("final_results")
+            do {
+                let sourcePath = rootURL
+                    .appendingPathComponent(NSUserName())
+                    .appendingPathComponent("CodeFormer")
+                    .appendingPathComponent("results")
+                    .appendingPathComponent("ToBeProcessed_0.7")
+                    .appendingPathComponent("final_results")
+                
+                try FileManager.default.copyItem(at: sourcePath, to: destinationPath)
+                print("Files copied successfully")
+            } catch {
+                print("Error copying files:", error.localizedDescription)
+            }
         }
     }
 }
