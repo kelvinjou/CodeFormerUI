@@ -1,4 +1,4 @@
-# CodeFormerGUI
+# CodeFormerUI
 ### Helps unblur faces 
 CodeFormer is trained on a ResNet50 image model and could restore partially cropped faces, blurry images, and convert grayscale faces to color. 
 
